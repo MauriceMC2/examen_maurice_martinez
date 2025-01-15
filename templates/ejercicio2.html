@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de sesión</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script>
+        function validateInput(event, pattern, nextField, errorMessage) {
+            const input = event.target;
+            const value = input.value.trim();
+            const errorElement = document.getElementById(errorMessage);
+
+            if (value === "" || pattern.test(value)) {
+                input.classList.remove("invalid");
+                input.classList.add("valid");
+                errorElement.style.display = "none";
+                if (nextField) {
+                    nextField.removeAttribute("disabled");
+                }
+            } else {
+                input.classList.remove("valid");
+                input.classList.add("invalid");
+                errorElement.style.display = "block";
+                if (nextField) {
+                    nextField.setAttribute("disabled", "true");
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const nameField = document.getElementById("nombre");
+            const passwordField = document.getElementById("contrasena");
+            const submitButton = document.querySelector("button[type='submit']");
+
+            passwordField.setAttribute("disabled", "true");
+            submitButton.setAttribute("disabled", "true");
+
+            nameField.addEventListener("input", (event) => validateInput(event, /^[A-Za-z]+$/, passwordField, "name-error"));
+            passwordField.addEventListener("input", (event) => validateInput(event, /^[A-Za-z0-9]*$/, submitButton, "password-error"));
+
+            document.querySelectorAll("input").forEach((input, index, inputs) => {
+                input.addEventListener("keypress", (event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        } else {
+                            submitButton.click();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Inicio de sesión</h1>
+        <form method="POST" action="/ejercicio2">
+            <label for="nombre">Ingresa tu nombre</label>
+            <input type="text" id="nombre" name="nombre" required>
+            <p id="name-error" class="error-message">Solo se permiten letras sin espacios ni caracteres especiales.</p>
+
+            <label for="contrasena">Ingresa tu contraseña</label>
+            <input type="password" id="contrasena" name="contrasena" disabled required>
+            <p id="password-error" class="error-message">Solo se permiten caracteres alfanuméricos.</p>
+
+            <button type="submit" disabled>Verificar</button>
+        </form>
+
+        {% if mensaje %}
+        <div class="result-container">
+            <p>{{ mensaje }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
